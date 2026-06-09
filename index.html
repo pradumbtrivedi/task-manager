@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Organize Your Projects</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Auth Container -->
+    <div id="authContainer" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Task Manager</h1>
+                <p>Organize & track your projects effortlessly</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <h2>Login</h2>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+                </form>
+                <p class="auth-switch">Don't have an account? <a href="#" onclick="switchAuthForm()">Register</a></p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form">
+                <h2>Create Account</h2>
+                <form id="registerFormElement">
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" placeholder="your_username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" placeholder="••••••••" required>
+                        <small id="passwordStrength" class="password-strength"></small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                </form>
+                <p class="auth-switch">Already have an account? <a href="#" onclick="switchAuthForm()">Sign In</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="appContainer" class="app-container" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>📋 Task Manager</h1>
+                <div class="header-actions">
+                    <span id="userDisplay" class="user-display"></span>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Projects</h3>
+                    <button class="btn btn-primary btn-full" onclick="showNewProjectModal()">+ New Project</button>
+                    <div id="projectsList" class="projects-list"></div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <section class="content-area">
+                <!-- Dashboard View -->
+                <div id="dashboardView" class="view active">
+                    <div class="dashboard-header">
+                        <h2>Welcome back!</h2>
+                        <p>Select a project to get started</p>
+                    </div>
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalProjects">0</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalTasks">0</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="completedTasks">0</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project View -->
+                <div id="projectView" class="view">
+                    <div class="project-header">
+                        <div>
+                            <h2 id="projectTitle"></h2>
+                            <p id="projectDescription" class="project-description"></p>
+                        </div>
+                        <div class="project-actions">
+                            <button class="btn btn-primary" onclick="showNewTaskModal()">+ Add Task</button>
+                            <button class="btn btn-secondary" onclick="showEditProjectModal()">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteProject()">Delete</button>
+                        </div>
+                    </div>
+
+                    <!-- Task Status Columns -->
+                    <div class="task-board">
+                        <div class="task-column">
+                            <h3 class="column-title">Pending</h3>
+                            <div id="pendingTasks" class="task-list"></div>
+                        </div>
+                        <div class="task-column">
+                            <h3 class="column-title">In Progress</h3>
+                            <div id="inProgressTasks" class="task-list"></div>
+                        </div>
+                        <div class="task-column">
+                            <h3 class="column-title">Completed</h3>
+                            <div id="completedTasksList" class="task-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modals -->
+
+    <!-- New Project Modal -->
+    <div id="newProjectModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('newProjectModal')">&times;</span>
+            <h2>Create New Project</h2>
+            <form id="newProjectForm">
+                <div class="form-group">
+                    <label for="projectName">Project Name *</label>
+                    <input type="text" id="projectName" placeholder="Enter project name" required>
+                </div>
+                <div class="form-group">
+                    <label for="projectDesc">Description</label>
+                    <textarea id="projectDesc" placeholder="Enter project description" rows="4"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Create Project</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newProjectModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Project Modal -->
+    <div id="editProjectModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editProjectModal')">&times;</span>
+            <h2>Edit Project</h2>
+            <form id="editProjectForm">
+                <div class="form-group">
+                    <label for="editProjectName">Project Name *</label>
+                    <input type="text" id="editProjectName" placeholder="Enter project name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editProjectDesc">Description</label>
+                    <textarea id="editProjectDesc" placeholder="Enter project description" rows="4"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Update Project</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editProjectModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Task Modal -->
+    <div id="newTaskModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('newTaskModal')">&times;</span>
+            <h2>Create New Task</h2>
+            <form id="newTaskForm">
+                <div class="form-group">
+                    <label for="taskTitle">Task Title *</label>
+                    <input type="text" id="taskTitle" placeholder="Enter task title" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDesc">Description</label>
+                    <textarea id="taskDesc" placeholder="Enter task description" rows="4"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">Priority</label>
+                        <select id="taskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDueDate">Due Date</label>
+                        <input type="date" id="taskDueDate">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Create Task</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newTaskModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div id="editTaskModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editTaskModal')">&times;</span>
+            <h2>Edit Task</h2>
+            <form id="editTaskForm">
+                <div class="form-group">
+                    <label for="editTaskTitle">Task Title *</label>
+                    <input type="text" id="editTaskTitle" placeholder="Enter task title" required>
+                </div>
+                <div class="form-group">
+                    <label for="editTaskDesc">Description</label>
+                    <textarea id="editTaskDesc" placeholder="Enter task description" rows="4"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editTaskStatus">Status</label>
+                        <select id="editTaskStatus">
+                            <option value="pending">Pending</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editTaskPriority">Priority</label>
+                        <select id="editTaskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editTaskDueDate">Due Date</label>
+                    <input type="date" id="editTaskDueDate">
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Update Task</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editTaskModal')">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
